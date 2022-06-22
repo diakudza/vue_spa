@@ -9,7 +9,7 @@
       <div class="">
         {{ val.text }}
       </div>
-      <button v-show="isAuth" class="btn coloure-green" @click="$emit('removeRecord', val.id)">удалить</button>
+      <button v-show="$store.state.user.isAuth" class="btn coloure-green" @click="$emit('removeRecord', val.id)">удалить</button>
     </div>
   </div>
 </template>
@@ -18,8 +18,9 @@
 export default {
   name: 'table-list',
   props: {
-    table: Array,
-    isAuth: Boolean
+    table: {
+      type: Array
+    },
   },
 }
 </script>

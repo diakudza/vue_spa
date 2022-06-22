@@ -1,20 +1,16 @@
-<template >
-    <div >
-sasdasd
-    </div>
-
+<template>
+  <div>
+    <TableList :table="table"/>
+  </div>
 </template>
-
 <script>
 
 import axios from "axios";
+import TableList from "@/components/TableList"
+import store from "@/store";
 
 export default {
-  components: {TestTable},
-  props: {
-    isAuth: Boolean,
-    host: String
-  },
+  components: {TableList},
   data() {
     return {
       value: 0,
@@ -24,17 +20,13 @@ export default {
       info: ''
     }
   },
-  // computed: {
-  //   auth() {
-  //     // eslint-disable-next-line vue/no-side-effects-in-computed-properties
-  //     return this.isAuth = (this.login !== '') ? true : false
-  //   }
-  // },
+  mounted() {
+    this.getFeedack();
+  },
   methods: {
-
-    async getNews() {
+    async getFeedack() {
       let count = (this.textValue == 0) ? 'all' : this.textValue;
-      await axios.get(`http://${this.host}/api/news`, {params: {count: count}})
+      await axios.get(`http://${store.state.main.host}/api/v1/feedback`, {params: {count: count}})
           .then(response => (this.info = response));
       this.table = this.info.data
     },
@@ -44,31 +36,30 @@ export default {
         alert('только числа!!')
       }
     },
-    addLine() {
-      let date = new Date();
-      let newString = {
-        'id': Date.now(),
-        'title': this.valForTable,
-        'date': date.toLocaleString()
-      }
-      this.table.push(newString)
-    },
-    async removeRecord(id) {
-      await axios.delete(`http://${this.host}/api/news`, {params: {id: id}})
-          .then(response => (this.info = response));
-      for (let [key] in this.table) {
-        if (this.table[key].id == id) {
-          this.table.splice(key, 1);
-        }
-      }
-    }
+     addLine() {
+       let date = new Date();
+       let newString = {
+         'id': Date.now(),
+         'title': this.valForTable,
+         'date': date.toLocaleString()
+       }
+       this.table.push(newString)
+     },
+     async removeRecord(id) {
+       await axios.delete(`http://${store.state.main.host}/api/v1/feedback`, {params: {id: id}})
+           .then(response => (this.info = response));
+       for (let [key] in this.table) {
+         if (this.table[key].id == id) {
+           this.table.splice(key, 1);
+         }
+       }
+     }
   }
 
 }
 </script>
 
 <style>
-
 
 
 .header {
