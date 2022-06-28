@@ -46,7 +46,11 @@ export default {
        this.table.push(newString)
      },
      async removeRecord(id) {
-       await axios.delete(`http://${store.state.main.host}/api/v1/feedback`, {params: {id: id}})
+       await axios.delete(`http://${store.state.main.host}/api/v1/feedback`,
+           {
+             params: {id: id},
+             headers: { Authorization : `Bearer ${store.state.user.token}`}
+           })
            .then(response => (this.info = response));
        for (let [key] in this.table) {
          if (this.table[key].id == id) {

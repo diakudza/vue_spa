@@ -12,45 +12,80 @@ import HeaderTop from '@/components/Header'
 import ModalLogin from "@/components/ModalLogin";
 import axios from "axios";
 import store from "../../../../../home/user/work/vuetest/src/store";
-// import {mapState} from "vuex";
+
+if (localStorage.getItem('token') === "undefined" ) {
+  localStorage.clear();
+}
+
+const token = localStorage.getItem('token')
 
 export default {
+
   components: {ModalLogin, HeaderTop},
   data() {
     return {
       showModal: false,
     }
   },
+
   methods: {
-    showLoginModal() {
-      this.showModal = !this.showModal
+    async showLoginModal() {
+      if (token != undefined) {
+        await axios.get(`http://${store.state.main.host}/api/v1/me`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              }
+            })
+            .then(response => (this.info = response))
+            .catch(function (error) {
+              console.log(error.response.data.errors)
+            });
+        this.fillUserStore(this.info.data)
+      } else {
+        this.showModal = !this.showModal
+      }
     },
     async doLogin(data) {
-
       await axios.post(`http://${store.state.main.host}/api/v1/login`, {email: data.email, password: data.password})
           .then(response => (this.info = response))
           .catch(function (error) {
             console.log(error.response.data.errors)
+            store.commit('user/setLoginFail', error.response.data.errors)
           });
       if (this.info.data.login == 'true') {
-        this.$store.commit('user/setIsAuth', true)
-        this.$store.commit('user/setEmail', this.info.data.profile.email)
-        this.$store.commit('user/setLogin', this.info.data.profile.login)
-        this.$store.commit('user/setProfile', this.info.data.profile)
-        this.$store.commit('user/loginFail', false)
+        this.fillUserStore(this.info.data)
         this.showModal = false
       } else {
-        this.$store.commit('user/loginFail',true)
+        store.commit('user/setLoginFail', true)
       }
     },
     async logout() {
       await axios.post(`http://${store.state.main.host}/api/v1/logout`)
           .then(response => (this.info = response));
+      this.clearUserStore();
+      this.$router.push('/')
+    },
+    fillUserStore(data) {
+      this.$store.commit('user/setIsAuth', true)
+      this.$store.commit('user/setEmail', data.profile.email)
+      this.$store.commit('user/setLogin', data.profile.login)
+      this.$store.commit('user/setProfile', data.profile)
+      this.$store.commit('user/setLoginFail', false)
+      this.$store.commit('user/setToken', data.token)
+      localStorage.setItem('token', data.token);
+    },
+    clearUserStore() {
       this.$store.commit('user/setLogin', '')
       this.$store.commit('user/setProfile', [])
       this.$store.commit('user/setEmail', '')
       this.$store.commit('user/setIsAuth', false)
-    },
+      this.$store.commit('user/setToken', '')
+      localStorage.removeItem('token');
+      localStorage.clear();
+
+    }
+
   }
 }
 </script>
@@ -107,4 +142,13 @@ export default {
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
 }
+
+.wrap {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+}
+
 </style>

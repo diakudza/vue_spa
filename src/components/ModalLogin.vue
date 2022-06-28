@@ -2,22 +2,24 @@
   <div class="back" @click.self="$emit('showModal')">
     <div class="box glass-box">
       <button class="btn coloure-green" @click="$emit('showModal')">X</button>
-      <input type="text" v-model="email" name="email" placeholder="email">
-      <input type="text" v-model="password" name="password" placeholder="password">
-      <p v-show="loginFail">Не верный логин или пароль</p>
-      <button class="btn bottom coloure-green" @click="$emit('logIn', { email: this.email, password: this.password})">LOGIN</button>
+      <input type="email" :class="{'alert': $store.state.user.loginFail.email}" v-model="email" required name="email" placeholder="email">
+      <input type="password" :class="{'alert': $store.state.user.loginFail.password}" v-model="password" required name="password" placeholder="password">
+      <p v-show="$store.state.user.loginFail">Не верный логин или пароль</p>
+      <button class="btn bottom coloure-green" @click="$emit('logIn', { email: this.email, password: this.password})">
+        LOGIN
+      </button>
     </div>
   </div>
 </template>
 
 <script>
+
 export default {
   name: 'modal-login',
   data() {
     return {
       email: '',
       password: '',
-      loginFail: false,
     }
   },
   methods: {}
@@ -28,6 +30,7 @@ export default {
 .bottom {
   align-self: flex-end;
 }
+
 .box {
   padding: 10px;
   align-self: center;
@@ -36,6 +39,10 @@ export default {
   justify-content: space-between;
   width: 300px;
   height: 100px;
+}
+
+.alert {
+  outline: solid rgba(255, 0, 0, 0.8) 2px;
 }
 
 .back {
@@ -50,9 +57,11 @@ export default {
   /*background: rgb(0, 0, 0, 70%);*/
   backdrop-filter: blur(5px);
 }
+
 .box-enter-active {
   animation: box 0.5s;
 }
+
 .box-leave-active {
   animation: box 0.5s reverse;
 }

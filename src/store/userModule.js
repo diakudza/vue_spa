@@ -4,8 +4,9 @@ export const userModule = {
         isAuth: '',
         email: '',
         login: '',
-        loginFail: false,
+        loginFail: '',
         profile: [],
+        token: '',
     }),
     getters: {
 
@@ -28,6 +29,9 @@ export const userModule = {
         },
         setProfile(state, profile) {
             state.profile = profile
+        },
+        setToken(state, token) {
+            state.token = token
         },
     },
     actions: {
